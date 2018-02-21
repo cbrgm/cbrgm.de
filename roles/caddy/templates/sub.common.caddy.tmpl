@@ -1,0 +1,4 @@
+# Configure certificates for ssl
+tls /home/{{ caddy_user }}/certs/sub.{{ domain }}.crt /home/{{ caddy_user }}/certs/sub.{{ domain }}.key
+log / stdout {combined}
+gzip

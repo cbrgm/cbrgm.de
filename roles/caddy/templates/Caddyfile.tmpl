@@ -6,8 +6,8 @@ www.{{ domain }}:80 {
 
 {{ domain }}:443,
 www.{{ domain }}:443 {
-    import common.caddy
-    root {{ web_root }}/{{ domain }}
+    import sub.common.caddy
+    root {{ caddy_web_path }}
 }
 
 postgres.{{ domain }}:80 {
@@ -16,7 +16,7 @@ postgres.{{ domain }}:80 {
 }
 
 postgres.{{ domain }}:443 {
-    import common.caddy
+    import sub.common.caddy
     basicauth / {{ username }} {{ user_password }}
     proxy / localhost:18000 {
         transparent
@@ -24,24 +24,24 @@ postgres.{{ domain }}:443 {
 }
 
 git.{{ domain }}:80 {
-    import common.caddy
+    import sub.common.caddy
     redir https://git.{{ domain }}
 }
 
 git.{{ domain }}:443 {
-    import common.caddy
+    import sub.common.caddy
     proxy / localhost:18100 {
         transparent
     }
 }
 
 dev.{{ domain }}:80 {
-    import common.caddy
+    import sub.common.caddy
     redir https://dev.{{ domain }}
 }
 
 dev.{{ domain }}:443 {
-    import common.caddy
+    import sub.common.caddy
     gzip {
         not /stream/
     }

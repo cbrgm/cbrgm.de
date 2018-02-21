@@ -1,8 +1,4 @@
 # Configure certificates for ssl
-{% if is_dev == "true" %}
-tls self_signed
-{% else %}
 tls /home/{{ caddy_user }}/certs/{{ domain }}.crt /home/{{ caddy_user }}/certs/{{ domain }}.key
-{% endif %}
-
+log / stdout {combined}
 gzip

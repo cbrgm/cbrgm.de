@@ -38,7 +38,7 @@
     group: "{{ caddy_group }}"
     state: directory
     mode: 0700
-- name: Install self-signed certificates
+- name: Install certificates
   become: true
   copy:
     src: "{{ item }}"
@@ -49,12 +49,14 @@
   with_items:
     - "{{ domain }}.key"
     - "{{ domain }}.crt"
+    - "sub.{{ domain }}.key"
+    - "sub.{{ domain }}.crt"
 
 # Create web directory at /var/www
-- name: "Create web directory at {{ web_root }}"
+- name: "Create web directory at {{ caddy_web_path }}"
   become: true
   file:
-    name: "/var/web/{{ domain }}"
+    name: "{{ caddy_web_path }}"
     owner: "{{ caddy_user }}"
     group: "{{ caddy_group }}"
     state: directory
@@ -80,6 +82,7 @@
   with_items:
     - Caddyfile
     - common.caddy
+    - sub.common.caddy
   notify:
     - caddy-validate
     - restart-caddy

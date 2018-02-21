@@ -5,7 +5,6 @@ email: chris@cbrgm.de
 hostname: cbrgm
 domain: "{{ domain | default('cbrgm.de') }}"
 
-web_root: /var/web
 is_dev: "{{ dev }}"
 
 # sensitive data

@@ -97,7 +97,8 @@
     dest: /etc/hosts
     line: '{{ item }}'
   with_items:
-    - '127.0.0.1 git.cbrgm.vnet'
-    - '127.0.0.1 dev.cbrgm.vnet'
-    - '127.0.0.1 cbrgm.vnet'
+    - '127.0.0.1 git.{{ domain }}'
+    - '127.0.0.1 dev.{{ domain }}'
+    - '127.0.0.1 postgres.{{ domain }}'
+    - '127.0.0.1 {{ domain }}'
   when: is_dev
