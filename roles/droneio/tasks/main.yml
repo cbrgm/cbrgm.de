@@ -50,6 +50,6 @@
     owner: "{{ drone_user }}"
 
 # Start containers
-- name: Start drone docker-compose.yml
+- name: "Start drone {{ drone_version }}"
   become: true
   command: "docker-compose -f /home/{{ drone_user }}/drone/docker/docker-compose.yml up -d"
