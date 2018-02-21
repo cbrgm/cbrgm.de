@@ -3,3 +3,5 @@
 /*.retry
 /backups
 .vault_pass
+*.crt
+*.key

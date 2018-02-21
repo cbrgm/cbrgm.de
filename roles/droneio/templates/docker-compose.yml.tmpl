@@ -1,7 +1,7 @@
 version: '2'
 services:
   drone-server:
-    image: drone/drone:latest
+    image: drone/drone:{{ drone_version }}
 
     ports:
       - {{ drone_port }}:8000
@@ -24,7 +24,7 @@ services:
         ipv4_address: 10.5.0.5
 
   drone-agent:
-    image: drone/agent:latest
+    image: drone/agent:{{ drone_version }}
     command: agent
     restart: always
     depends_on:
