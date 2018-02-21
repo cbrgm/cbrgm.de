@@ -1,0 +1,20 @@
+---
+# nonsensitive data
+username: chris
+email: chris@cbrgm.de
+hostname: cbrgm
+domain: "{{ domain | default('cbrgm.de') }}"
+
+web_root: /var/web
+is_dev: "{{ dev }}"
+
+# sensitive data
+user_password: "{{ vault_user_password }}"
+db_password: "{{ vault_db_password }}"
+db_name: "{{ vault_db_name }}"
+
+gitea_password: "{{ vault_gitea_password }}"
+gitea_secret: "{{ vault_gitea_secret }}"
+
+drone_password: "{{ vault_drone_password }}"
+drone_secret: "{{ vault_drone_secret }}"

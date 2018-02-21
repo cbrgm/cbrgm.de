@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Insert fancy ASCII Logo below to be a real h4ck3r
+#cat /etc/profile.d/logo
+cat <<HEREDOC
+
+HOSTNAME.... $(hostname)
+SYSTEM...... $(uname --operating-system --kernel-name --machine --kernel-release)
+UPTIME...... $(uptime --pretty)
+
+$(df --local --exclude-type=tmpfs --exclude-type=devtmpfs --human-readable --total)
+
+HEREDOC

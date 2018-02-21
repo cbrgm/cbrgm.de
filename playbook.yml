@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: false # see pre_tasks
+  become: yes
+  become_method: sudo
+  roles:
+    - general
+    - postgres
+    - pgweb
+    - gitea
+    - caddy
+    - droneio

@@ -1,0 +1,55 @@
+---
+# Create user and group to run droneio
+- name: "Create group {{ drone_group }}"
+  become: true
+  group:
+    name: "{{ drone_group }}"
+- name: "Create user {{ drone_user }}"
+  become: true
+  user:
+    name: "{{ drone_user }}"
+    comment: "Security user for droneio"
+    append: true
+    group: "{{ drone_group }}"
+    shell: /bin/false
+
+# Create database user and database
+- name: "Create postgres user {{ drone_user }}"
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: "{{ drone_user }}"
+    password: "{{ drone_password }}"
+- name: "Create database {{ drone_db }}"
+  become: true
+  become_user: "postgres"
+  postgresql_db:
+    name: "{{ drone_db }}"
+    owner: "{{ drone_user }}"
+    state: present
+
+# Install directory structure
+- name: Create droneio directory structure
+  become: true
+  become_user: "{{ drone_user }}"
+  file:
+    path: "/home/{{ drone_user }}/drone/{{ item }}"
+    state: directory
+    mode: 0700
+  with_items:
+    - docker
+
+# Create docker compose file
+- name: Create docker-compose.yml
+  become: true
+  become_user: "{{ drone_user }}"
+  template:
+    src: docker-compose.yml.tmpl
+    dest: "/home/{{ drone_user }}/drone/docker/docker-compose.yml"
+    mode: 0600
+    owner: "{{ drone_user }}"
+
+# Start containers
+- name: Start drone docker-compose.yml
+  become: true
+  command: "docker-compose -f /home/{{ drone_user }}/drone/docker/docker-compose.yml up -d"

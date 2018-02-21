@@ -1,0 +1,6 @@
+---
+caddy_user: caddy
+caddy_group: caddy
+caddy_email: chris@cbrgm.de
+caddy_path: /usr/local/bin/caddy
+caddy_config_path: /etc/caddy/Caddyfile

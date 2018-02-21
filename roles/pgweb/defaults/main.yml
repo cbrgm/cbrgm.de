@@ -1,0 +1,6 @@
+---
+pg_host: localhost
+pg_port: 5432
+pgweb_version: v0.9.11
+pgweb_path: /usr/bin/pgweb
+pgweb_port: 18000

@@ -1,0 +1,6 @@
+---
+drone_user: drone
+drone_group: drone
+drone_host: https://dev.{{ domain }}
+drone_port: 18200
+drone_db: droneio

@@ -1,0 +1,103 @@
+# Change hostname
+#- name: Change hostname to {{ hostname }}
+#  hostname:
+#    name: "{{ hostname }}"
+
+# Set language settings
+- name: "Generate {{ locale }}"
+  locale_gen:
+    name: "{{ locale }}"
+    state: present
+- name: Set {{ locale }}
+  become: true
+  command: "update-locale LANG={{ locale }}"
+
+# Update timezone
+- name: Set timezone to UTC
+  timezone:
+    name: Etc/UTC
+
+# Set fancy motd
+- name: Set fancy motd
+  template:
+    src: motd.sh.tmpl
+    dest: "/etc/profile.d/motd.sh"
+    mode: 0755
+  become: true
+
+# Change systemd-journald log path to /var/log/journal
+- name: Create systemd-journald log path at /var/log/journal
+  become: true
+  file:
+    path: /var/log/journal
+    state: directory
+    mode: 0600
+  notify: restart-journald
+
+# Install software packages
+- name: Update package index
+  apt:
+    update_cache: true
+  become: true
+
+- name: Install basic packages
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - 'git'
+    - 'vim'
+    - 'htop'
+    - 'docker.io'
+    - 'docker-compose'
+    - 'curl'
+    - 'python3-pip'
+    - 'unzip'
+    - 'golang-go'
+
+# Install default user and groups
+- name: Check sudo group and create if not exists
+  become: true
+  group:
+    name: sudo
+    state: present
+- name: Check docker group and create if not exists
+  become: true
+  group:
+    name: docker
+    state: present
+- name: "Allow passwordless sudo for {{ username }}"
+  template:
+    src: sudoers.tmpl
+    dest: "/etc/sudoers.d/10-{{ username }}"
+    mode: 0444
+  become: true
+- name: "Create user {{ username }}"
+  become: true
+  user:
+    name: "{{ username }}"
+    comment: "{{ email }}"
+    append: true
+    groups: sudo, docker
+    shell: /bin/bash
+    system: no
+    password: "{{ vault_user_password | password_hash('sha512')}}"
+- name: Authorize SSH key
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  become: true
+
+# Change etc/hosts when dev mode is active
+- name: Change etc/hosts when dev mode is active
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    line: '{{ item }}'
+  with_items:
+    - '127.0.0.1 git.cbrgm.vnet'
+    - '127.0.0.1 dev.cbrgm.vnet'
+    - '127.0.0.1 cbrgm.vnet'
+  when: is_dev

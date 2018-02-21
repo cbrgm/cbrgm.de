@@ -1,0 +1,101 @@
+---
+# Create user and group to run webserver
+- name: "Create group {{ caddy_group }}"
+  become: true
+  group:
+    name: "{{ caddy_group }}"
+- name: "Create user {{ caddy_user }}"
+  become: true
+  user:
+    name: "{{ caddy_user }}"
+    comment: "Security user for using caddy webserver"
+    append: true
+    group: "{{ caddy_group }}"
+    shell: /bin/false
+
+# Install latest caddy binaries and install go
+- name: "Download Gitea {{ gitea_version }} binaries"
+  become: true
+  get_url:
+    url: https://getcaddy.com
+    dest: "/home/{{ caddy_user }}/caddy_installer.sh"
+    mode: 0755
+- name: Install Caddy
+  become: true
+  command: "/home/{{ caddy_user }}/caddy_installer.sh personal"
+
+# Allow caddy to use ports in range 1-1024
+- name: Allow caddy to use well-known ports
+  become: true
+  command: "setcap cap_net_bind_service=+ep {{ caddy_path }}"
+
+# Install certificates
+- name: Create caddy certificate directory
+  become: true
+  file:
+    name: "/home/{{ caddy_user }}/certs"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    state: directory
+    mode: 0700
+- name: Install self-signed certificates
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "/home/{{ caddy_user }}/certs/{{ item }}"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    mode: 0400
+  with_items:
+    - "{{ domain }}.key"
+    - "{{ domain }}.crt"
+
+# Create web directory at /var/www
+- name: "Create web directory at {{ web_root }}"
+  become: true
+  file:
+    name: "/var/web/{{ domain }}"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    state: directory
+    mode: 0700
+
+# Create caddy configuration directory and create Caddyfile
+- name: Create caddy configuration directory
+  become: true
+  file:
+    name: "/etc/caddy"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    state: directory
+    mode: 0700
+- name: Configure caddy
+  become: true
+  template:
+    src: "{{ item }}.tmpl"
+    dest: "/etc/caddy/{{ item }}"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    mode: 0400
+  with_items:
+    - Caddyfile
+    - common.caddy
+  notify:
+    - caddy-validate
+    - restart-caddy
+
+# Make caddy autostart
+- name: Install caddy systemd unit
+  become: true
+  template:
+    src: caddy.service.tmpl
+    dest: /etc/systemd/system/caddy.service
+    mode: 0600
+- name: Start caddy
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: caddy
+    state: started
+    enabled: true
+  notify: restart-caddy

@@ -1,0 +1,47 @@
+version: '2'
+services:
+  drone-server:
+    image: drone/drone:latest
+
+    ports:
+      - {{ drone_port }}:8000
+      - 9000
+    volumes:
+      - /var/lib/drone:/var/lib/drone/
+    restart: always
+    environment:
+      - DRONE_OPEN=true
+      - DRONE_HOST={{ drone_host }}
+      - DRONE_ADMIN={{ username }}
+      - DRONE_GOGS=true
+      - DRONE_GOGS_URL=https://git.{{ domain }}
+      - DRONE_GOGS_SKIP_VERIFY=true
+      - DRONE_SECRET={{ drone_secret }}
+      - DRONE_DATABASE_DRIVER=postgres
+      - DRONE_DATABASE_DATASOURCE=postgres://{{ drone_user }}:{{ drone_password }}@10.5.0.1/{{ drone_db }}
+    networks:
+      drone:
+        ipv4_address: 10.5.0.5
+
+  drone-agent:
+    image: drone/agent:latest
+    command: agent
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=drone-server:9000
+      - DRONE_SECRET={{ drone_secret }}
+    networks:
+      drone:
+        ipv4_address: 10.5.0.6
+
+networks:
+  drone:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

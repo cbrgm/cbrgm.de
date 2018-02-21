@@ -1,0 +1,52 @@
+{{ domain }}:80,
+www.{{ domain }}:80 {
+    import common.caddy
+    redir https://www.{{ domain }}
+}
+
+{{ domain }}:443,
+www.{{ domain }}:443 {
+    import common.caddy
+    root {{ web_root }}/{{ domain }}
+}
+
+postgres.{{ domain }}:80 {
+    import common.caddy
+    redir https://postgres.{{ domain }}
+}
+
+postgres.{{ domain }}:443 {
+    import common.caddy
+    basicauth / {{ username }} {{ user_password }}
+    proxy / localhost:18000 {
+        transparent
+    }
+}
+
+git.{{ domain }}:80 {
+    import common.caddy
+    redir https://git.{{ domain }}
+}
+
+git.{{ domain }}:443 {
+    import common.caddy
+    proxy / localhost:18100 {
+        transparent
+    }
+}
+
+dev.{{ domain }}:80 {
+    import common.caddy
+    redir https://dev.{{ domain }}
+}
+
+dev.{{ domain }}:443 {
+    import common.caddy
+    gzip {
+        not /stream/
+    }
+    proxy / localhost:18200 {
+        websocket
+        transparent
+    }
+}

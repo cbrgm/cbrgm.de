@@ -1,0 +1,67 @@
+# Install postgres server
+- name: Install postgres server
+  become: true
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - "postgresql"
+    - "postgresql-contrib"
+- name: Install psycopg2 python module
+  become: true
+  pip:
+    name: psycopg2
+
+# Allow remote access
+- name: Ensure postgres is accessible by public
+  become: true
+  lineinfile:
+    dest: /etc/postgresql/9.5/main/postgresql.conf
+    regexp: '^#?listen_addresses\s*='
+    line: "listen_addresses = '*'"
+    state: present
+
+# Allow user login
+- name: Allow login for all users
+  become: true
+  lineinfile:
+    dest: /etc/postgresql/9.5/main/pg_hba.conf
+    line: '{{ item }}'
+  with_items:
+    - '# TYPE DATABASE USER CIDR-ADDRESS  METHOD'
+    - 'host  all  all 0.0.0.0/0 md5'
+
+# Start the server
+- name: Start postgres server
+  become: true
+  systemd:
+    name: postgresql
+    state: restarted
+    enabled: true
+
+# Create database user
+- name: Create postgres User {{ username }}
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: "{{ username }}"
+    password: "{{ db_password }}"
+    role_attr_flags: SUPERUSER
+
+# Create database
+- name: Create database {{ db_name }}
+  become: true
+  become_user: "{{ username }}"
+  postgresql_db:
+    name: "{{ db_name }}"
+    login_user: "{{ username }}"
+    state: present
+- name: Create schematas for {{ db_name }}
+  become: true
+  become_user: "{{ username }}"
+  postgresql_schema:
+    database: "{{ db_name }}"
+    name: blog
+    login_user: "{{ username }}"
+    login_password: "{{ db_password }}"

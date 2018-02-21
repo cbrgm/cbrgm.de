@@ -1,0 +1,83 @@
+---
+# Create gitea user and group
+- name: "Create group {{ gitea_group }}"
+  become: true
+  group:
+    name: "{{ gitea_group }}"
+- name: "Create user {{ gitea_user }}"
+  become: true
+  user:
+    name: "{{ gitea_user }}"
+    comment: "Administrator for gitea"
+    append: true
+    group: "{{ gitea_group }}"
+    shell: /bin/false
+
+# Download and install binaries
+- name: "Download gitea v{{ gitea_version }} installation files"
+  become: true
+  get_url:
+    url: "https://github.com/go-gitea/gitea/releases/download/v{{ gitea_version }}/gitea-{{ gitea_version }}-linux-amd64"
+    dest: "{{ gitea_path }}"
+    mode: 0755
+
+# Create gitea directory structure
+- name: Create gitea directory structure
+  become: true
+  become_user: "{{ gitea_user }}"
+  file:
+    path: "/home/{{ gitea_user }}/gitea/{{ item }}"
+    state: directory
+    mode: 0700
+  with_items:
+    - repos
+    - logs
+    - data/conf
+
+# Create gitea configuration
+- name: Create gitea configuration
+  become: true
+  template:
+    src: app.ini.tmpl
+    dest: "/home/{{ gitea_user }}/gitea/data/conf/app.ini"
+    mode: 0600
+    owner: "{{ gitea_user }}"
+
+# Install service unit
+- name: Install gitea systemd unit
+  become: true
+  template:
+    src: gitea.service.tmpl
+    dest: /etc/systemd/system/gitea.service
+    mode: 0600
+
+# Create postgres user and database
+- name: "Create postgres user {{ gitea_user }}"
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: "{{ gitea_user }}"
+    password: "{{ gitea_password }}"
+- name: "Create database {{ gitea_db }}"
+  become: true
+  become_user: "postgres"
+  postgresql_db:
+    owner: "{{ gitea_user }}"
+    name: "{{ gitea_db }}"
+    state: present
+
+# Start gitea service
+- name: Start gitea service
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: gitea
+    state: started
+    enabled: true
+  notify: restart-gitea
+
+# Create gitea admin user
+- name: "Create gitea admin user {{ username }}"
+  become: true
+  become_user: "{{ gitea_user }}"
+  command: "gitea admin create-user --name {{ username }} --password {{ user_password }} --email {{ email }} --admin --config /home/{{ gitea_user }}/gitea/data/conf/app.ini"
