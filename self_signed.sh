@@ -12,7 +12,7 @@ root_ca_key="${ssl_dir}/private/root-ca.key"
 
 # Create .ssl directory if not exists
 if [[ ! -e ${ssl_dir} ]]; then
-  echo "\nCreating .ssl directory at ${ssl_dir} ...\n"
+  echo "Creating .ssl directory at ${ssl_dir} ...\n"
   mkdir -p ${ssl_dir}/certs ${ssl_dir}/crl ${ssl_dir}/newcerts ${ssl_dir}/private
   chmod 700 ${ssl_dir}/private
   touch ${ssl_dir}/index.txt
@@ -21,13 +21,13 @@ fi
 
 # Create root key if not exists
 if [ ! -f ${root_ca_key} ]; then
-  echo "\nCreating root CA key ...\n"
+  echo "Creating root CA key ...\n"
   openssl genrsa -out ${root_ca_key} 4096
 fi
 
 # Create root certificate if not exists
 if [ ! -f ${root_ca_crt} ]; then
-  echo "\nCreating root CA certificate ...\n"
+  echo "Creating root CA certificate ...\n"
   openssl req \
     -subj "/C=DE/ST=Hamburg/L=Hamburg/O=${domain} CA Authority/CN=${domain}" \
     -key ${root_ca_key} \
@@ -38,7 +38,7 @@ fi
 
 # Ask prompt for yes no
 while true; do
-  read -p "\nAre you sure you want to generate new self signed certificates?" yn
+  read -p "Are you sure you want to generate new self signed certificates?" yn
   case $yn in
     [Yy]* ) break ;;
     [Nn]* ) exit ;;
@@ -48,6 +48,8 @@ done
 
 # Create self signed client certificates request
 # Generate certificate requests, for main domain and subdomains
+mkdir -p ${caddy_files_dir}
+
 openssl req \
   -subj "/C=DE/ST=Hamburg/L=Hamburg/O=${domain}/CN=${domain}" \
   -new -sha256 -nodes \
