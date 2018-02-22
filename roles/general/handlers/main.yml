@@ -1,3 +1,4 @@
+---
 - name: Restart journal process
   listen: restart-journald
   become: true

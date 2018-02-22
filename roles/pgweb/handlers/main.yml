@@ -1,3 +1,4 @@
+---
 - name: Restart pgweb
   listen: restart-pgweb
   become: true

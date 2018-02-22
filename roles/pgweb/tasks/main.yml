@@ -1,3 +1,4 @@
+---
 # Unzip binaries TODO
 - name: "Download and unarchive pgweb {{ pgweb_version }}"
   unarchive:
