@@ -62,6 +62,16 @@
     state: directory
     mode: 0700
 
+# Create files public directory at /var/www
+- name: "Create files public directory at {{ caddy_web_files_path }}"
+  become: true
+  file:
+    name: "{{ caddy_web_files_path }}"
+    owner: "{{ caddy_user }}"
+    group: "{{ caddy_group }}"
+    state: directory
+    mode: 0700
+
 # Create caddy configuration directory and create Caddyfile
 - name: Create caddy configuration directory
   become: true

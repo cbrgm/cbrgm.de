@@ -6,12 +6,12 @@ www.{{ domain }}:80 {
 
 {{ domain }}:443,
 www.{{ domain }}:443 {
-    import sub.common.caddy
+    import common.caddy
     root {{ caddy_web_path }}
 }
 
 postgres.{{ domain }}:80 {
-    import common.caddy
+    import sub.common.caddy
     redir https://postgres.{{ domain }}
 }
 
@@ -48,5 +48,19 @@ dev.{{ domain }}:443 {
     proxy / localhost:18200 {
         websocket
         transparent
+    }
+}
+
+files.{{ domain }}:80 {
+    import sub.common.caddy
+    redir https://files.{{ domain }}
+}
+
+files.{{ domain }}:443 {
+    import sub.common.caddy
+    root {{ caddy_web_files_path }}
+    browse
+    mime {
+      .mkv video/webm
     }
 }

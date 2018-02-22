@@ -4,4 +4,5 @@ caddy_group: caddy
 caddy_email: chris@cbrgm.de
 caddy_path: /usr/local/bin/caddy
 caddy_web_path: /home/{{ caddy_user }}/data/{{ domain }}
+caddy_web_files_path: /home/{{ caddy_user }}/data/public
 caddy_config_path: /etc/caddy/Caddyfile

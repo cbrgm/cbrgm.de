@@ -11,6 +11,7 @@ vm: playbook.yml Vagrantfile vagrant
 
 vagrant:
 	vagrant up
+	sleep 5
 
 clean:
 	rm -f *.retry

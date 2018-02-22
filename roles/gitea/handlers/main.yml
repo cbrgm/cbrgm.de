@@ -1,3 +1,4 @@
+---
 - name: Restart gitea
   listen: restart-gitea
   become: true

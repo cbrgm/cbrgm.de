@@ -1,3 +1,4 @@
+---
 # Install postgres server
 - name: Install postgres server
   become: true
