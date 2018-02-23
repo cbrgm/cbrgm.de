@@ -6,6 +6,11 @@ set -euo pipefail
 timestamp=${1:-''}
 selection=${2:-''}
 
+# Set timestamp if null
+if [[ -z ${timestamp} ]]; then
+  timestamp=`date +%Y-%m-%d`
+fi
+
 # global vars
 domain="cbrgm.vnet"
 backup_dir="./backup/${timestamp}"
