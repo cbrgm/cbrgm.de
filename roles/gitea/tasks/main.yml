@@ -76,8 +76,17 @@
     enabled: true
   notify: restart-gitea
 
+# Check if gitea admin already exists
+- name: Check if gitea admin user was created before
+  become: true
+  become_user: "{{ gitea_user }}"
+  command: "psql 'postgresql://{{ gitea_user }}:{{ gitea_password }}@localhost/{{ gitea_db }}' --no-align --tuples-only --quiet --command 'select exists (select 1 from \"user\" where is_admin);'"
+  register: gitea_admin_exists
+
+
 # Create gitea admin user
 - name: "Create gitea admin user {{ username }}"
   become: true
   become_user: "{{ gitea_user }}"
   command: "gitea admin create-user --name {{ username }} --password {{ user_password }} --email {{ email }} --admin --config /home/{{ gitea_user }}/gitea/data/conf/app.ini"
+  when: gitea_admin_exists.stdout.strip() == 'f'
