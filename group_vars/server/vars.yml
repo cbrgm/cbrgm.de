@@ -7,7 +7,6 @@ domain: "{{ domain | default('cbrgm.de') }}"
 
 is_dev: "{{ dev | default('true') }}"
 
-
 # sensitive data
 user_password: "{{ vault_user_password }}"
 db_password: "{{ vault_db_password }}"

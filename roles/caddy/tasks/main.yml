@@ -51,6 +51,7 @@
     - "{{ domain }}.crt"
     - "sub.{{ domain }}.key"
     - "sub.{{ domain }}.crt"
+  when: is_dev
 
 # Create web directory at /var/www
 - name: "Create web directory at {{ caddy_web_path }}"
