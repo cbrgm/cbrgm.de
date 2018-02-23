@@ -11,6 +11,7 @@ The playbook will deploy the following services fully configurated:
 - [x] postgres
 - [x] pgweb
 - [x] droneio
+- [ ] prometheus
 
 TODO:
 

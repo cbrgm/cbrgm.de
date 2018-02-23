@@ -5,7 +5,8 @@ email: chris@cbrgm.de
 hostname: cbrgm
 domain: "{{ domain | default('cbrgm.de') }}"
 
-is_dev: "{{ dev }}"
+is_dev: "{{ dev | default('true') }}"
+
 
 # sensitive data
 user_password: "{{ vault_user_password }}"

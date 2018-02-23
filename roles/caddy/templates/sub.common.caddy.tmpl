@@ -1,4 +1,6 @@
 # Configure certificates for ssl
+{{% if is_dev %}}
 tls /home/{{ caddy_user }}/certs/sub.{{ domain }}.crt /home/{{ caddy_user }}/certs/sub.{{ domain }}.key
+{{% endif %}}
 log / stdout {combined}
 gzip
