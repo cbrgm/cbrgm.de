@@ -10,12 +10,11 @@ The playbook will deploy the following services fully configurated:
 - [x] gitea
 - [x] postgres
 - [x] pgweb
-- [ ] droneio
+- [x] droneio
 
 TODO:
 
-- [ ] Clean-Up Variables
-- [ ] Simplyfiy deployment
+- [ ] Auto-Generate Backup Scripts?
 
 ## Contact
 
