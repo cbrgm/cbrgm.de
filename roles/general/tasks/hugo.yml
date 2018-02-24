@@ -1,0 +1,16 @@
+---
+- name: "Download and install hugo version {{ hugo_version }}"
+  become: true
+  unarchive:
+    src: "https://github.com/gohugoio/hugo/releases/download/v{{ hugo_version }}/hugo_{{ hugo_version }}_Linux-64bit.tar.gz"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    mode: 0755
+- name: Cleanup hugo installation (Removing Readme and Licence files)
+  become: true
+  file:
+    state: absent
+    path: "/usr/local/bin/{{ item }}"
+  with_items:
+    - LICENSE.md
+    - README.md

@@ -56,6 +56,7 @@
     - 'python3-pip'
     - 'unzip'
     - 'golang-go'
+    - 'tree'
 
 # Install default user and groups
 - name: Check sudo group and create if not exists
@@ -104,3 +105,6 @@
     - '127.0.0.1 postgres.{{ domain }}'
     - '127.0.0.1 {{ domain }}'
   when: is_dev
+
+# Install hugo version
+- include: hugo.yml
