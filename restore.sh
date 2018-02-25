@@ -8,32 +8,33 @@ selection=${2:-''}
 
 # global vars
 domain="cbrgm.vnet"
+ssh_port=22
 backup_dir="./backup/${timestamp}"
 
 function restore_postgres {
   local database="$1"
   local postgres_backup="${backup_dir}/${database}-postgres-${timestamp}.gz"
   echo "Restore ${backup_dir}/${database}-postgres-${timestamp}.gz ..."
-  cat ${postgres_backup} | gunzip -c - | ssh ${domain} "pg_restore --user=chris --dbname=${database} --clean"
+  cat ${postgres_backup} | gunzip -c - | ssh -p ${ssh_port} ${domain} "pg_restore --user=chris --dbname=${database} --clean"
 }
 
 # Backup all gitea files
 function restore_gitea {
   local gitea_backup="${backup_dir}/gitea-backup-${timestamp}.tar.gz"
   echo "Restore gitea from ${gitea_backup} ..."
-  ssh ${domain} "sudo systemctl stop gitea"
-  cat ${gitea_backup} | ssh ${domain} "sudo tar -C /home/git -xzvf -"
+  ssh -p ${ssh_port} ${domain} "sudo systemctl stop gitea"
+  cat ${gitea_backup} | ssh -p ${ssh_port} ${domain} "sudo tar -C /home/git -xzvf -"
   restore_postgres gitea
-  ssh ${domain} "sudo systemctl start gitea"
+  ssh -p ${ssh_port} ${domain} "sudo systemctl start gitea"
 }
 
 # Restore all caddyserver files
 function restore_caddy {
   local caddy_backup="${backup_dir}/caddy-backup-${timestamp}.tar.gz"
   echo "Restore caddyserver from ${caddy_backup} ..."
-  ssh ${domain} "sudo systemctl stop caddy"
-  cat ${caddy_backup} | ssh ${domain} "sudo tar -C /home/caddy -xzvf -"
-  ssh ${domain} "sudo systemctl start caddy"
+  ssh -p ${ssh_port} ${domain} "sudo systemctl stop caddy"
+  cat ${caddy_backup} | ssh -p ${ssh_port} ${domain} "sudo tar -C /home/caddy -xzvf -"
+  ssh -p ${ssh_port} ${domain} "sudo systemctl start caddy"
 }
 
 # Restore all droneio data
@@ -41,10 +42,10 @@ function restore_caddy {
 function restore_drone {
   local drone_backup="${backup_dir}/drone-backup-${timestamp}.tar.gz"
   echo "Restore drone data from ${drone_backup} ..."
-  ssh ${domain} "sudo docker-compose -f /home/drone/drone/docker/docker-compose.yml down"
-  cat ${drone_backup} | ssh ${domain} "sudo tar -C /home/drone -xzvf -"
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/drone/drone/docker/docker-compose.yml down"
+  cat ${drone_backup} | ssh -p ${ssh_port} ${domain} "sudo tar -C /home/drone -xzvf -"
   restore_postgres droneio
-  ssh ${domain} "sudo docker-compose -f /home/drone/drone/docker/docker-compose.yml up -d"
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/drone/drone/docker/docker-compose.yml up -d"
 }
 
 case "${selection}" in

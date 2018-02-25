@@ -18,6 +18,7 @@ clean:
 
 clean-vm:
 	vagrant destroy -f
-	ssh-keygen -f "/home/chris/.ssh/known_hosts" -R "10.0.30.10"
+	ssh-keygen -f ~/.ssh/known_hosts -R "10.0.30.10"
+	ssh-keygen -f ~/.ssh/known_hosts -R "cbrgm.vnet"
 
 clean-all: clean clean-vm
