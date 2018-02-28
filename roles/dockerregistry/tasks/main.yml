@@ -40,6 +40,9 @@
   become_user: "{{ dockerhub_user }}"
   command: "htpasswd -Bb -c {{ dockerhub_workdir }}/auth/htpasswd {{ username }} {{ user_password }}"
 
+- include: dev_certs.yml
+  when: is_dev
+
 # Create docker-compose file
 - name: Create docker-compose.yml
   become: true
@@ -49,45 +52,6 @@
     dest: "{{ dockerhub_workdir }}/docker-compose.yml"
     mode: 0600
     owner: "{{ dockerhub_user }}"
-
-# Enable self signed ssl certificates for testing purposes
-- name: Create docker certs directory
-  become: true
-  file:
-    name: "/etc/docker/certs.d/docker.{{ domain }}:18300"
-    owner: "{{ dockerhub_user }}"
-    group: "{{ dockerhub_group}}"
-    state: directory
-    mode: 0770
-  when: is_dev
-- name: Enable self signed ssl certificates for testing
-  become: true
-  copy:
-    src: "{{ item }}"
-    dest: "/etc/docker/certs.d/docker.{{ domain }}:18300/{{ item }}"
-    owner: "{{ dockerhub_user }}"
-    group: "{{ dockerhub_group }}"
-    mode: 0440
-  with_items:
-    - ca.crt
-  when: is_dev
-
-# Ubuntu update-ca-certificates
-- name: Add root certificate to trusted CAs for testing
-  become: true
-  copy:
-    src: "{{ item }}"
-    dest: "/usr/local/share/ca-certificates/{{ item }}"
-    owner: root
-    group: root
-    mode: 0440
-  with_items:
-    - ca.crt
-  when: is_dev
-- name: Enable root certificate
-  become: true
-  command: update-ca-certificates
-  when: is_dev
 
 # Start registry docker compose
 - name: "Start docker registry"

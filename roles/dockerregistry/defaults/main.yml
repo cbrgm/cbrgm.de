@@ -4,6 +4,10 @@ dockerhub_group: dockerhub
 dockerhub_workdir: /home/{{ dockerhub_user }}/registry
 dockerhub_port: 18300
 
-dockerhub_tls_certificate: sub.{{ domain }}.crt
-dockerhub_tls_key: sub.{{ domain }}.key
-dockerhub_tls_directory: /home/caddy/certs/
+dockerhub_tls_test_certificate: sub.{{ domain }}.crt
+dockerhub_tls_test_key: sub.{{ domain }}.key
+dockerhub_tls_test_directory: /home/caddy/certs/
+
+dockerhub_tls_certificate: docker.cbrgm.de.crt
+dockerhub_tls_key: docker.cbrgm.de.key
+dockerhub_tls_directory: /home/caddy/certs/acme/acme-v01.api.letsencrypt.org/sites/docker.cbrgm.de/
