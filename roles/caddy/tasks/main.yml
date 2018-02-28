@@ -37,7 +37,7 @@
     owner: "{{ caddy_user }}"
     group: "{{ caddy_group }}"
     state: directory
-    mode: 0700
+    mode: 0770
 - name: Install certificates
   become: true
   copy:
@@ -45,7 +45,7 @@
     dest: "/home/{{ caddy_user }}/certs/{{ item }}"
     owner: "{{ caddy_user }}"
     group: "{{ caddy_group }}"
-    mode: 0400
+    mode: 0440
   with_items:
     - "{{ domain }}.key"
     - "{{ domain }}.crt"
@@ -61,7 +61,7 @@
     owner: "{{ caddy_user }}"
     group: "{{ caddy_group }}"
     state: directory
-    mode: 0700
+    mode: 0770
 
 # Create files public directory at /var/www
 - name: "Create files public directory at {{ caddy_web_files_path }}"
@@ -71,7 +71,7 @@
     owner: "{{ caddy_user }}"
     group: "{{ caddy_group }}"
     state: directory
-    mode: 0700
+    mode: 0770
 
 # Create caddy configuration directory and create Caddyfile
 - name: Create caddy configuration directory

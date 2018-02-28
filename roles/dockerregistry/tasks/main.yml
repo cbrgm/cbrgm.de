@@ -1,0 +1,95 @@
+---
+# Create user and group to run droneio
+- name: "Create group {{ dockerhub_group }}"
+  become: true
+  group:
+    name: "{{ dockerhub_group }}"
+- name: "Create user {{ dockerhub_user }}"
+  become: true
+  user:
+    name: "{{ dockerhub_user }}"
+    comment: "Security user for docker registry"
+    append: true
+    group: "{{ dockerhub_group }}"
+    groups: docker,caddy
+    shell: /bin/false
+
+# Install directory structure
+- name: Create docker registry directory structure
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  file:
+    path: "{{ dockerhub_workdir }}/{{ item }}"
+    state: directory
+    group: "{{ dockerhub_group }}"
+    mode: 0770
+  with_items:
+    - data
+    - auth
+
+# Create htpasswd file and use bcrypt as encryption type (as its the only one dockerregistry supports...)
+- name: Install basic packages
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - 'apache2-utils'
+- name: "Create htpasswd, creating registry user {{ username }} and password"
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  command: "htpasswd -Bb -c {{ dockerhub_workdir }}/auth/htpasswd {{ username }} {{ user_password }}"
+
+# Create docker-compose file
+- name: Create docker-compose.yml
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  template:
+    src: docker-compose.yml.tmpl
+    dest: "{{ dockerhub_workdir }}/docker-compose.yml"
+    mode: 0600
+    owner: "{{ dockerhub_user }}"
+
+# Enable self signed ssl certificates for testing purposes
+- name: Create docker certs directory
+  become: true
+  file:
+    name: "/etc/docker/certs.d/docker.{{ domain }}:18300"
+    owner: "{{ dockerhub_user }}"
+    group: "{{ dockerhub_group}}"
+    state: directory
+    mode: 0770
+  when: is_dev
+- name: Enable self signed ssl certificates for testing
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/docker/certs.d/docker.{{ domain }}:18300/{{ item }}"
+    owner: "{{ dockerhub_user }}"
+    group: "{{ dockerhub_group }}"
+    mode: 0440
+  with_items:
+    - ca.crt
+  when: is_dev
+
+# Ubuntu update-ca-certificates
+- name: Add root certificate to trusted CAs for testing
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/share/ca-certificates/{{ item }}"
+    owner: root
+    group: root
+    mode: 0440
+  with_items:
+    - ca.crt
+  when: is_dev
+- name: Enable root certificate
+  become: true
+  command: update-ca-certificates
+  when: is_dev
+
+# Start registry docker compose
+- name: "Start docker registry"
+  become: true
+  command: "docker-compose -f /home/{{ dockerhub_user }}/registry/docker-compose.yml up -d"

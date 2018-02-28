@@ -5,7 +5,7 @@ all: vm
 vm: playbook.yml Vagrantfile vagrant
 	sleep 5
 	ansible-playbook -u vagrant \
-									 --extra-vars "domain=cbrgm.vnet" \
+									 --extra-vars "domain=cbrgm.vnet dev=true" \
 									 --private-key ./.vagrant/machines/default/virtualbox/private_key \
 									 -e "ansible_python_interpreter=/usr/bin/python3" \
 									 playbook.yml

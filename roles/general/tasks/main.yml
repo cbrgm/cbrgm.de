@@ -99,6 +99,7 @@
     dest: /etc/hosts
     line: '{{ item }}'
   with_items:
+    - '127.0.0.1 docker.{{ domain }}'
     - '127.0.0.1 files.{{ domain }}'
     - '127.0.0.1 git.{{ domain }}'
     - '127.0.0.1 dev.{{ domain }}'

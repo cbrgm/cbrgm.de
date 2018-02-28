@@ -1,0 +1,9 @@
+---
+dockerhub_user: dockerhub
+dockerhub_group: dockerhub
+dockerhub_workdir: /home/{{ dockerhub_user }}/registry
+dockerhub_port: 18300
+
+dockerhub_tls_certificate: sub.{{ domain }}.crt
+dockerhub_tls_key: sub.{{ domain }}.key
+dockerhub_tls_directory: /home/caddy/certs/
