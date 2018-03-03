@@ -14,7 +14,7 @@
     shell: /bin/false
 
 # Install latest caddy binaries and install go
-- name: "Download Gitea {{ gitea_version }} binaries"
+- name: "Download caddy binaries"
   become: true
   get_url:
     url: https://getcaddy.com
