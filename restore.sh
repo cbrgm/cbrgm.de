@@ -37,6 +37,14 @@ function restore_caddy {
   ssh -p ${ssh_port} ${domain} "sudo systemctl start caddy"
 }
 
+function restore_docker {
+  local docker_backup="${backup_dir}/docker_backup-${timestamp}.tar.gz"
+  echo "Restore docker data from ${docker_backup} ..."
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/dockerhub/registry/docker-compose.yml down"
+  cat ${docker_backup} | ssh -p ${ssh_port} ${domain} "sudo tar -C /home/dockerhub -xzvf -"
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/dockerhub/registry/docker-compose.yml up -d"
+}
+
 # Restore all droneio data
 # Restoring includes drone users /home/ directory and database dump
 function restore_drone {
@@ -58,9 +66,13 @@ case "${selection}" in
   "drone")
     restore_drone
     ;;
+  "docker")
+    restore_docker
+    ;;
   ""|"all")
     restore_caddy
     restore_gitea
     restore_drone
+    restore_docker
     ;;
 esac

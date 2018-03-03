@@ -28,7 +28,7 @@
     - auth
 
 # Create htpasswd file and use bcrypt as encryption type (as its the only one dockerregistry supports...)
-- name: Install basic packages
+- name: Install apache2-utils for htpasswd binaries
   apt:
     name: "{{ item }}"
     update_cache: true
@@ -40,6 +40,7 @@
   become_user: "{{ dockerhub_user }}"
   command: "htpasswd -Bb -c {{ dockerhub_workdir }}/auth/htpasswd {{ username }} {{ user_password }}"
 
+# Allow self signed certificates on system and docker
 - include: dev_certs.yml
   when: is_dev
 
