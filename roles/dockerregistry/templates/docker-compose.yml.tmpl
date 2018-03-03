@@ -6,7 +6,7 @@ services:
     ports:
       - {{ dockerhub_port }}:5000
     environment:
-{% if is_dev %}
+{% if is_dev == 'true' %}
       REGISTRY_HTTP_TLS_CERTIFICATE: /certs/{{ dockerhub_tls_test_certificate }}
       REGISTRY_HTTP_TLS_KEY: /certs/{{ dockerhub_tls_test_key }}
 {% else %}
@@ -18,7 +18,7 @@ services:
       REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
     volumes:
       - {{ dockerhub_workdir }}/data:/var/lib/registry
-{% if is_dev %}
+{% if is_dev == 'true' %}
       - {{ dockerhub_tls_test_directory }}:/certs
 {% else %}
       - {{ dockerhub_tls_directory }}:/certs
