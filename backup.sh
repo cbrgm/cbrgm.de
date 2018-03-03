@@ -45,6 +45,15 @@ function backup_caddy {
   ssh -p ${ssh_port} ${domain} "sudo systemctl start caddy"
 }
 
+# Backup all dockerhub files
+function backup_docker {
+  local docker_backup="${backup_dir}/docker_backup-${timestamp}.tar.gz"
+  echo "Backup dockerhub files in ${docker_backup} ..."
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/dockerhub/registry/docker-compose.yml down"
+  ssh -p ${ssh_port} ${domain} "sudo tar -C /home/dockerhub -cf - registry" | gzip -9c > ${docker_backup}
+  ssh -p ${ssh_port} ${domain} "sudo docker-compose -f /home/dockerhub/registry/docker-compose.yml up -d"
+}
+
 function backup_drone {
   local drone_backup="${backup_dir}/drone-backup-${timestamp}.tar.gz"
   echo "Backup drone data in ${drone_backup} ..."
@@ -64,9 +73,13 @@ case "${selection}" in
   "drone")
     backup_drone
     ;;
+  "docker")
+    backup_docker
+    ;;
   ""|"all")
     backup_caddy
     backup_gitea
     backup_drone
+    backup_docker
     ;;
 esac

@@ -1,0 +1,26 @@
+version: '2'
+services:
+  registry:
+    restart: always
+    image: registry:2
+    ports:
+      - {{ dockerhub_port }}:5000
+    environment:
+{% if is_dev %}
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/{{ dockerhub_tls_test_certificate }}
+      REGISTRY_HTTP_TLS_KEY: /certs/{{ dockerhub_tls_test_key }}
+{% else %}
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/{{ dockerhub_tls_certificate }}
+      REGISTRY_HTTP_TLS_KEY: /certs/{{ dockerhub_tls_key }}
+{% endif %}
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    volumes:
+      - {{ dockerhub_workdir }}/data:/var/lib/registry
+{% if is_dev %}
+      - {{ dockerhub_tls_test_directory }}:/certs
+{% else %}
+      - {{ dockerhub_tls_directory }}:/certs
+{% endif %}
+      - {{ dockerhub_workdir }}/auth:/auth

@@ -1,0 +1,35 @@
+---
+# Enable self signed ssl certificates for testing purposes
+- name: Create docker certs directory
+  become: true
+  file:
+    name: "/etc/docker/certs.d/docker.{{ domain }}:18300"
+    owner: "{{ dockerhub_user }}"
+    group: "{{ dockerhub_group}}"
+    state: directory
+    mode: 0770
+- name: Enable self signed ssl certificates for testing
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/docker/certs.d/docker.{{ domain }}:18300/{{ item }}"
+    owner: "{{ dockerhub_user }}"
+    group: "{{ dockerhub_group }}"
+    mode: 0440
+  with_items:
+    - ca.crt
+
+# Ubuntu update-ca-certificates
+- name: Add root certificate to trusted CAs for testing
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/share/ca-certificates/{{ item }}"
+    owner: root
+    group: root
+    mode: 0440
+  with_items:
+    - ca.crt
+- name: Enable root certificate
+  become: true
+  command: update-ca-certificates

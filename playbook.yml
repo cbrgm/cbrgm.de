@@ -10,3 +10,4 @@
     - gitea
     - caddy
     - droneio
+    - dockerregistry

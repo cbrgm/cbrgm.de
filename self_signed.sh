@@ -7,6 +7,7 @@ set -e
 domain="cbrgm.vnet"
 ssl_dir="$HOME/.ssl"
 caddy_files_dir="./roles/caddy/files"
+docker_files_dir="./roles/dockerregistry/files"
 root_ca_crt="${ssl_dir}/certs/root-ca.crt"
 root_ca_key="${ssl_dir}/private/root-ca.key"
 
@@ -80,5 +81,9 @@ openssl x509 -req -in "${caddy_files_dir}/sub.${domain}.csr" \
   -out "${caddy_files_dir}/sub.${domain}.crt" \
   -days 365 \
   -sha256
+
+# Copy root certificate to dockerhub role dir
+[[ ! -e ${docker_files_dir} ]] && mkdir ${docker_files_dir}
+cat ${root_ca_crt} > ${docker_files_dir}/ca.crt
 
 rm "${caddy_files_dir}/sub.${domain}.csr" "${caddy_files_dir}/${domain}.csr"

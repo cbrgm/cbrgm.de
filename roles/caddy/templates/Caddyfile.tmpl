@@ -64,3 +64,15 @@ files.{{ domain }}:443 {
       .mkv video/webm
     }
 }
+
+docker.{{ domain }}:80 {
+    import sub.common.caddy
+    redir https://docker.{{ domain }}
+}
+
+docker.{{ domain }}:443 {
+    import sub.common.caddy
+    proxy / https://docker.{{ domain }}:18300 {
+        transparent
+    }
+}

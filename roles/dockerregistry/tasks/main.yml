@@ -1,0 +1,60 @@
+---
+# Create user and group to run droneio
+- name: "Create group {{ dockerhub_group }}"
+  become: true
+  group:
+    name: "{{ dockerhub_group }}"
+- name: "Create user {{ dockerhub_user }}"
+  become: true
+  user:
+    name: "{{ dockerhub_user }}"
+    comment: "Security user for docker registry"
+    append: true
+    group: "{{ dockerhub_group }}"
+    groups: docker,caddy
+    shell: /bin/false
+
+# Install directory structure
+- name: Create docker registry directory structure
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  file:
+    path: "{{ dockerhub_workdir }}/{{ item }}"
+    state: directory
+    group: "{{ dockerhub_group }}"
+    mode: 0770
+  with_items:
+    - data
+    - auth
+
+# Create htpasswd file and use bcrypt as encryption type (as its the only one dockerregistry supports...)
+- name: Install apache2-utils for htpasswd binaries
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - 'apache2-utils'
+- name: "Create htpasswd, creating registry user {{ username }} and password"
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  command: "htpasswd -Bb -c {{ dockerhub_workdir }}/auth/htpasswd {{ username }} {{ user_password }}"
+
+# Allow self signed certificates on system and docker
+- include: dev_certs.yml
+  when: is_dev
+
+# Create docker-compose file
+- name: Create docker-compose.yml
+  become: true
+  become_user: "{{ dockerhub_user }}"
+  template:
+    src: docker-compose.yml.tmpl
+    dest: "{{ dockerhub_workdir }}/docker-compose.yml"
+    mode: 0600
+    owner: "{{ dockerhub_user }}"
+
+# Start registry docker compose
+- name: "Start docker registry"
+  become: true
+  command: "docker-compose -f /home/{{ dockerhub_user }}/registry/docker-compose.yml up -d"
