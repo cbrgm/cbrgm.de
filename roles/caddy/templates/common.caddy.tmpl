@@ -2,5 +2,6 @@
 {% if is_dev == 'true' %}
 tls /home/{{ caddy_user }}/certs/{{ domain }}.crt /home/{{ caddy_user }}/certs/{{ domain }}.key
 {% endif %}
+prometheus
 log / stdout {combined}
 gzip

@@ -1,0 +1,32 @@
+---
+# Download node exporter
+- name: "Download and unarchive node_exporter installation files {{ node_exporter_version }}"
+  become: true
+  unarchive:
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/home/{{ prometheus_user }}/"
+    remote_src: yes
+    mode: 0755
+- name: "Move binaries to prometheus path"
+  become: true
+  command: "mv /home/{{ prometheus_user }}/node_exporter-{{ node_exporter_version }}.linux-amd64/{{ item }} /usr/local/bin/{{ item }}"
+  with_items:
+    - node_exporter
+- name: Clean installation directory
+  command: "rm -rf /home/{{ prometheus_user }}/node_exporter-{{ node_exporter_version }}*"
+
+# Install systemd service
+- name: Install node_exporter systemd unit
+  become: true
+  template:
+    src: node_exporter.service.tmpl
+    dest: /etc/systemd/system/node_exporter.service
+    mode: 0600
+  notify: restart-node-exporter
+- name: Start node_exporter
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: node_exporter
+    state: started
+    enabled: true

@@ -22,7 +22,7 @@
     mode: 0755
 - name: Install Caddy
   become: true
-  command: "/home/{{ caddy_user }}/caddy_installer.sh personal"
+  command: "/home/{{ caddy_user }}/caddy_installer.sh personal http.forwardproxy,http.prometheus"
 
 # Allow caddy to use ports in range 1-1024
 - name: Allow caddy to use well-known ports

@@ -1,0 +1,17 @@
+---
+# prometheus vars
+prometheus_version: 2.2.0-rc.1
+prometheus_user: prometheus
+prometheus_group: prometheus
+
+prometheus_path: /usr/local/bin/prometheus
+prometheus_config_path: /etc/prometheus/config.yml
+prometheus_storage_path: /home/{{ prometheus_user }}/data
+prometheus_port: 9090
+prometheus_address: "0.0.0.0:{{ prometheus_port }}"
+
+# Node exporter vars
+node_exporter_version: 0.15.2
+node_exporter_path: /usr/local/bin/node_exporter
+node_exporter_port: 9100
+node_exporter_address: "0.0.0.0:{{ node_exporter_port }}"

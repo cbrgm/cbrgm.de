@@ -1,0 +1,22 @@
+[Unit]
+Description=prometheus - Monitoring system and time series database.
+Documentation=https://github.com/prometheus/prometheus
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+Restart=on-abnormal
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
+ExecStart={{ prometheus_path }}\
+    --web.listen-address "{{ prometheus_address }}"\
+    --storage.tsdb.path "{{ prometheus_storage_path }}"\
+    --config.file "{{ prometheus_config_path }}"
+PrivateTmp=true
+PrivateDevices=true
+;ProtectHome=true
+ProtectSystem=full
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

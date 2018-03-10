@@ -76,3 +76,16 @@ docker.{{ domain }}:443 {
         transparent
     }
 }
+
+prometheus.{{ domain }}:80 {
+    import sub.common.caddy
+    redir https://prometheus.{{ domain }}
+}
+
+prometheus.{{ domain }}:443 {
+    import sub.common.caddy
+    basicauth / {{ username }} {{ user_password }}
+    proxy / localhost:9090 {
+        transparent
+    }
+}
