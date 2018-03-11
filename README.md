@@ -13,10 +13,11 @@ The playbook will deploy the following services fully configurated:
 - [x] droneio
 - [x] docker registry
 - [x] prometheus (with node exporter)
-- [ ] grafana
+- [x] grafana
 
 TODO:
 
+- [ ] Cleanup
 - [ ] Auto-Generate Backup Scripts?
 
 ## Contact
