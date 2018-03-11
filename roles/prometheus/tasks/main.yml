@@ -1,0 +1,69 @@
+---
+# Create user and group to run prometheus
+- name: "Create group {{ prometheus_group }}"
+  become: true
+  group:
+    name: "{{ prometheus_group }}"
+- name: "Create user {{ prometheus_user }}"
+  become: true
+  user:
+    name: "{{ prometheus_user }}"
+    comment: "Security user for prometheus"
+    append: true
+    group: "{{ prometheus_group }}"
+    shell: /bin/false
+
+# Download prometheus binaries
+- name: "Download and unarchive prometheus installation files {{ prometheus_version }}"
+  become: true
+  unarchive:
+    src: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/home/{{ prometheus_user }}/"
+    remote_src: yes
+    mode: 0755
+- name: "Move binaries to prometheus path"
+  become: true
+  command: "mv /home/{{ prometheus_user }}/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }} /usr/local/bin/{{ item }}"
+  with_items:
+    - prometheus
+    - promtool
+
+# Install configuration
+- name: "Create prometheus folder paths at {{ prometheus_storage_path }}"
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0700
+  with_items:
+    - /etc/prometheus
+    - "{{ prometheus_storage_path }}"
+- name: Install prometheus configuration
+  become: true
+  template:
+    src: prometheus.yml.tmpl
+    dest: /etc/prometheus/config.yml
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0600
+  notify: restart-prometheus
+# Install service
+- name: Install prometheus systemd unit
+  become: true
+  template:
+    src: prometheus.service.tmpl
+    dest: /etc/systemd/system/prometheus.service
+    mode: 0600
+  notify: restart-prometheus
+- name: Start prometheus service
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: prometheus
+    state: started
+    enabled: true
+
+# Install node exporter
+- include: node_exporter.yml

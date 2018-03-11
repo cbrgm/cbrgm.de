@@ -9,5 +9,6 @@
     - pgweb
     - gitea
     - caddy
+    - prometheus
     - droneio
     - dockerregistry

@@ -1,5 +1,5 @@
 ---
-# Unzip binaries TODO
+# Unzip binaries
 - name: "Download and unarchive pgweb {{ pgweb_version }}"
   unarchive:
     src: "https://github.com/sosedoff/pgweb/releases/download/{{ pgweb_version }}/pgweb_linux_amd64.zip"

@@ -12,7 +12,8 @@ The playbook will deploy the following services fully configurated:
 - [x] pgweb
 - [x] droneio
 - [x] docker registry
-- [ ] prometheus
+- [x] prometheus (with node exporter)
+- [ ] grafana
 
 TODO:
 
