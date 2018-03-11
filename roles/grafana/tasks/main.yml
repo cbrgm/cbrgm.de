@@ -1,0 +1,88 @@
+---
+- name: "Create group {{ grafana_group }}"
+  become: true
+  group:
+    name: "{{ grafana_group }}"
+- name: "Create grafana user {{ grafana_user }}"
+  become: true
+  user:
+    name: "{{ grafana_user }}"
+    comment: "Grafana run user"
+    append: true
+    group: "{{ grafana_group }}"
+    shell: /bin/false
+
+# Create home path
+- name: Create grafana home path
+  become: true
+  file:
+    path: /usr/share/grafana
+    state: directory
+    mode: 0755
+
+# Install grafana
+- name: "Download and unarchive grafana installation files {{ grafana_version }}"
+  become: true
+  unarchive:
+    src: "https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-{{ grafana_version }}.linux-x64.tar.gz"
+    dest: "/home/{{ grafana_user }}/"
+    remote_src: yes
+    mode: 0755
+- name: "Move binaries to grafana path"
+  become: true
+  command: "mv /home/{{ grafana_user }}/grafana-{{ grafana_version }}/bin/{{ item }} /usr/local/bin/{{ item }}"
+  with_items:
+    - grafana-server
+    - grafana-cli
+- name: Move conf directory and public directory to /usr/share/grafana
+  become: true
+  command: "mv /home/{{ grafana_user }}/grafana-{{ grafana_version }}/{{ item }} /usr/share/grafana/{{ item }}"
+  with_items:
+    - conf
+    - public
+
+# Install grafana config
+- name: Create grafana config path
+  become: true
+  file:
+    path: /etc/grafana
+    state: directory
+    mode: 0755
+- name: Install grafana configuration
+  become: true
+  template:
+    src: config.ini.tmpl
+    dest: /etc/grafana/config.ini
+    mode: 0644
+  notify: restart-grafana
+
+# Create systemd unit
+- name: Install grafana systemd unit
+  become: true
+  template:
+    src: grafana.service.tmpl
+    dest: /etc/systemd/system/grafana.service
+    mode: 0600
+  notify: restart-grafana
+
+## Create database user and database
+- name: Create postgres user grafana
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: grafana
+    password: "{{ grafana_password }}"
+- name: "Create database {{ grafana_db_name }}"
+  become: true
+  become_user: "postgres"
+  postgresql_db:
+    name: "{{ grafana_db_name }}"
+    owner: "{{ grafana_user }}"
+    state: present
+- name: Start grafana
+  become: true
+  systemd:
+    daemon_reload: yes
+    name: grafana
+    state: started
+    enabled: true

@@ -89,3 +89,16 @@ prometheus.{{ domain }}:443 {
         transparent
     }
 }
+
+grafana.{{ domain }}:80 {
+    import sub.common.caddy
+    redir https://grafana.{{ domain }}
+}
+
+grafana.{{ domain }}:443 {
+    import sub.common.caddy
+    basicauth / {{ username }} {{ user_password }}
+    proxy / localhost:18500 {
+        transparent
+    }
+}

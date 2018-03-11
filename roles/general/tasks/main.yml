@@ -99,6 +99,7 @@
     dest: /etc/hosts
     line: '{{ item }}'
   with_items:
+    - '127.0.0.1 grafana.{{ domain }}'
     - '127.0.0.1 prometheus.{{ domain }}'
     - '127.0.0.1 docker.{{ domain }}'
     - '127.0.0.1 files.{{ domain }}'
