@@ -10,5 +10,6 @@
     - gitea
     - caddy
     - prometheus
+    - grafana
     - droneio
     - dockerregistry

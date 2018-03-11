@@ -1,0 +1,10 @@
+---
+grafana_version: 5.0.1
+grafana_user: grafana
+grafana_group: grafana
+
+grafana_address: 0.0.0.0
+grafana_port: 18500
+grafana_domain: "grafana.{{ domain }}"
+
+grafana_db_name: grafana
