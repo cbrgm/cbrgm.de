@@ -18,10 +18,14 @@ rule_files:
 # Here it's Prometheus itself.
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'prometheus'
+  - job_name: 'node'
 
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
 
     static_configs:
-      - targets: ['localhost:9090','localhost:{{ caddy_web_exporter }}', 'localhost:{{ node_exporter_port }}']
+      - targets: ['localhost:9090', 'localhost:{{ node_exporter_port }}']
+
+  - job_name: 'caddy'
+    static_configs:
+      - targets: ['localhost:{{ caddy_web_exporter }}']
