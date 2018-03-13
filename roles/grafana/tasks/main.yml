@@ -40,6 +40,10 @@
   with_items:
     - conf
     - public
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/home/{{ grafana_user }}/grafana-{{ grafana_version }}/"
 
 # Install grafana config
 - name: Create grafana config path

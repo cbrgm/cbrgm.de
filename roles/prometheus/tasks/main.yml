@@ -27,6 +27,10 @@
   with_items:
     - prometheus
     - promtool
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/home/{{ prometheus_user }}/prometheus-{{ prometheus_version }}.linux-amd64/"
 
 # Install configuration
 - name: "Create prometheus folder paths at {{ prometheus_storage_path }}"

@@ -1,7 +1,7 @@
 [Unit]
 Description=grafana - monitoring and metric analytics & dashboards
 Documentation=https://grafana.org/
-After=prometheus.target
+After=prometheus.target caddy.target
 Wants=network-online.target systemd-networkd-wait-online.service
 
 [Service]

@@ -12,8 +12,11 @@
   command: "mv /home/{{ prometheus_user }}/node_exporter-{{ node_exporter_version }}.linux-amd64/{{ item }} /usr/local/bin/{{ item }}"
   with_items:
     - node_exporter
-- name: Clean installation directory
-  command: "rm -rf /home/{{ prometheus_user }}/node_exporter-{{ node_exporter_version }}*"
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/home/{{ prometheus_user }}/node_exporter-{{ node_exporter_version }}.linux-amd64/"
+
 
 # Install systemd service
 - name: Install node_exporter systemd unit
