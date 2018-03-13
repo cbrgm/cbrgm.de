@@ -1,4 +1,4 @@
-.PHONY: vm vagrant clean clean-all
+.PHONY: vm vagrant clean clean-all cbrgm.de
 
 all: vm
 
@@ -12,6 +12,15 @@ vm: playbook.yml Vagrantfile vagrant
 
 vagrant:
 	vagrant up
+
+cbrgm.de: playbook.yml
+	ansible-playbook -u ansible \
+									--ask-pass \
+									--ask-become-pass \
+									--extra-vars="domain=cbrgm.de dev=false" \
+									-e "ansible_python_interpreter=/usr/bin/python3" \
+									-e "ansible_ssh_port=26543" \
+									playbook.yml
 
 clean:
 	rm -f *.retry
